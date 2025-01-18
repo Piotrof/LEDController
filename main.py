@@ -9,8 +9,6 @@ if custom_lib_path not in sys.path:
 from fastapi import FastAPI
 import uvicorn
 from endpoints import router
-import getpass
-print("FastAPI is running as:", getpass.getuser())
 
 # Import the custom middleware
 from ApiKeyAuth import ApiKeyAuthMiddleware
