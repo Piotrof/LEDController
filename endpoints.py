@@ -22,7 +22,7 @@ async def drawImage():
     brightness = 20
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
-    image = Image.open("~/LEDController/res/tea_sample.jpg")
+    image = Image.open("/root/LEDController/res/tea_sample.jpg")
     image = image.convert("RGB")
     image = display.scaleImage(image, 28)
     display.drawImage(matrix,image,[2,2])
