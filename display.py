@@ -52,39 +52,56 @@ def initializeMatrix(options: RGBMatrixOptions) -> RGBMatrix:
     matrix = RGBMatrix(options=options)
     return matrix
 
-def drawImage(matrix: RGBMatrix, xsize: int, ysize: int, startpos: list[int]):
+def drawImage(matrix: RGBMatrix, image: Image.Image, startpos: list[int]):
     """
-    Draws a static rectangle of size xsize x ysize at the specified top-left
-    coordinates on the given RGB matrix.
+    Draws the provided PIL Image pixel-by-pixel on the given RGB matrix at the
+    specified top-left coordinates.
 
     Args:
         matrix (RGBMatrix): The RGB matrix on which to draw.
-        xsize (int): The width of the rectangle.
-        ysize (int): The height of the rectangle.
-        startpos (list[int] or tuple[int, int]): [x, y] coordinates of the rectangle's
+        image (PIL.Image.Image): The PIL Image to be drawn.
+        startpos (list[int] or tuple[int, int]): [x, y] coordinates of the image's
             top-left corner on the matrix.
 
     Raises:
-        ValueError: If the provided matrix is not an instance of RGBMatrix, or if
-            startpos is not a list/tuple of length 2.
+        ValueError: If the provided matrix is not an instance of RGBMatrix, if 'image'
+            is not a PIL Image, or if 'startpos' is not a 2-element list/tuple.
     """
+    # Validate matrix
     if not isinstance(matrix, RGBMatrix):
         raise ValueError("Provided matrix must be an instance of RGBMatrix.")
 
+    # Validate image
+    if not isinstance(image, Image.Image):
+        raise ValueError("Provided image must be a PIL Image object.")
+
     # Validate startpos
-    if (not isinstance(startpos, (list, tuple))) or len(startpos) != 2:
-        raise ValueError(
-            "startpos must be a list or tuple of two integers, e.g., [x, y]."
-        )
+    if not isinstance(startpos, (list, tuple)) or len(startpos) != 2:
+        raise ValueError("startpos must be a list or tuple of two integers, e.g., [x, y].")
 
     startx, starty = startpos
 
-    # Create an image buffer the size of the desired rectangle
-    image = Image.new("RGB", (xsize, ysize))
-    draw = ImageDraw.Draw(image)
+    # Get image dimensions
+    width, height = image.size
 
-    # Draw a rectangle across the entire image area
-    draw.rectangle((0, 0, xsize - 1, ysize - 1), fill=(0, 0, 0), outline=(0, 0, 255))
+    # Draw each pixel to the matrix
+    # (Assuming the image is in "RGB" mode; if it's RGBA, handle the alpha channel as needed)
+    for y in range(height):
+        for x in range(width):
+            r, g, b = image.getpixel((x, y))
+            matrix.SetPixel(startx + x, starty + y, r, g, b)
 
-    # Render this image at the specified position on the matrix
-    matrix.SetImage(image, startx, starty)
+def scaleImage(image: Image.Image, new_size: int) -> Image.Image:
+    """
+    Scales the given PIL Image to new_size x new_size pixels and returns the resized image.
+    
+    Args:
+        image (PIL.Image.Image): The input image to scale.
+        new_size (int): The width and height (in pixels) to which the image should be scaled.
+    
+    Returns:
+        PIL.Image.Image: A new Image object resized to new_size x new_size pixels.
+    """
+    # Use a high-quality resampling filter such as LANCZOS
+    resized_image = image.resize((new_size, new_size), resample=Image.Resampling.LANCZOS)
+    return resized_image
