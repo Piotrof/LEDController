@@ -1,17 +1,22 @@
 from fastapi import APIRouter
+import display
 
 router = APIRouter()
 
 @router.get("/hello")
-async def say_hello():
+async def sayHello():
     """
-    A simple asynchronous endpoint returning a greeting.
+    This endpoint will return user info (IP, API key, currently used TIDAL login info etc.)
     """
     return {"message": "Hello from your async endpoint!"}
 
-@router.get("/items/{item_id}")
-async def read_item(item_id: int):
+@router.post("/draw")
+async def drawImage():
     """
-    A simple endpoint that takes a path parameter and returns a mock item.
+    Test endpoint to draw an image to the matrix
     """
-    return {"item_id": item_id, "item_name": f"Item {item_id}"}
+    brightness = 20
+    options = display.setMatrixOptions(brightness)
+    matrix = display.initializeMatrix(options)
+    display.drawImage(matrix)
+    return {"message": "success"}
