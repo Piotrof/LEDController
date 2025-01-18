@@ -23,7 +23,7 @@ async def drawImage():
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
     image = Image.open("res/tea_sample.jpg")
-    image = image.conver("RGB")
+    image = image.convert("RGB")
     image = display.scaleImage(image, 28)
     display.drawImage(matrix,image,[2,2])
     time.sleep(10)
