@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+
+# Internal module imports
 import display
 
 router = APIRouter()

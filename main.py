@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add the custom library folder to sys.path
+custom_lib_path = os.path.expanduser("~/rpi-rgb-led-matrix/bindings/python")
+if custom_lib_path not in sys.path:
+    sys.path.append(custom_lib_path)
+
 from fastapi import FastAPI
 import uvicorn
 from endpoints import router
