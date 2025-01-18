@@ -1,37 +1,19 @@
+from fastapi import FastAPI
+import uvicorn
+from endpoints import router
 
-#!/usr/bin/env python
-import time
-import sys
+# Import the custom middleware
+from ApiKeyAuth import ApiKeyAuthMiddleware
 
-from rgbmatrix import RGBMatrix, RGBMatrixOptions
-from PIL import Image
+# Create the FastAPI instance
+app = FastAPI(title="LEDController")
 
-if len(sys.argv) < 2:
-    sys.exit("Require an image argument")
-else:
-    image_file = sys.argv[1]
+# Add the API Key Auth middleware
+app.add_middleware(ApiKeyAuthMiddleware)
 
-image = Image.open(image_file)
+# Include the router from endpoints.py
+app.include_router(router)
 
-# Configuration for the matrix
-options = RGBMatrixOptions()
-options.rows = 32
-options.cols = 64
-options.chain_length = 1
-options.parallel = 1
-options.brightness = 50
-options.hardware_mapping = 'adafruit-hat'  # If you have an Adafruit HAT: 'adafruit-hat'
-
-matrix = RGBMatrix(options = options)
-
-# Make image fit our screen.
-image.thumbnail((matrix.width, matrix.height), Image.ANTIALIAS)
-
-matrix.SetImage(image.convert('RGB'))
-
-try:
-    print("Press CTRL-C to stop.")
-    while True:
-        time.sleep(100)
-except KeyboardInterrupt:
-    sys.exit(0)
+if __name__ == "__main__":
+    # Run the application using uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
