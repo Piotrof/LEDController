@@ -3,6 +3,10 @@ from PIL import Image
 from PIL import ImageDraw
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
+"""
+This file contains all functions necessary to controll the LED display
+"""
+
 def setMatrixOptions(brightness: int):
     """
     Creates and returns a configured RGBMatrixOptions object.
@@ -48,33 +52,39 @@ def initializeMatrix(options: RGBMatrixOptions) -> RGBMatrix:
     matrix = RGBMatrix(options=options)
     return matrix
 
-def drawImage(matrix: RGBMatrix):
+def drawImage(matrix: RGBMatrix, xsize: int, ysize: int, startpos: list[int]):
     """
-    Draws an image with basic graphics primitives and scrolls it across the given RGB matrix.
+    Draws a static rectangle of size xsize x ysize at the specified top-left
+    coordinates on the given RGB matrix.
 
     Args:
-        matrix (RGBMatrix): The RGB matrix on which to draw and animate the image.
+        matrix (RGBMatrix): The RGB matrix on which to draw.
+        xsize (int): The width of the rectangle.
+        ysize (int): The height of the rectangle.
+        startpos (list[int] or tuple[int, int]): [x, y] coordinates of the rectangle's
+            top-left corner on the matrix.
 
     Raises:
-        ValueError: If the provided matrix is not an instance of RGBMatrix.
+        ValueError: If the provided matrix is not an instance of RGBMatrix, or if
+            startpos is not a list/tuple of length 2.
     """
     if not isinstance(matrix, RGBMatrix):
         raise ValueError("Provided matrix must be an instance of RGBMatrix.")
 
-    # Create an image canvas (can be larger than the matrix if desired)
-    image = Image.new("RGB", (32, 32))  # Adjust size as needed
-    draw = ImageDraw.Draw(image)  # Create a drawing context
+    # Validate startpos
+    if (not isinstance(startpos, (list, tuple))) or len(startpos) != 2:
+        raise ValueError(
+            "startpos must be a list or tuple of two integers, e.g., [x, y]."
+        )
 
-    # Draw shapes on the canvas
-    draw.rectangle((0, 0, 31, 31), fill=(0, 0, 0), outline=(0, 0, 255))  # Blue outline
-    draw.line((0, 0, 31, 31), fill=(255, 0, 0))  # Red diagonal line
-    draw.line((0, 31, 31, 0), fill=(0, 255, 0))  # Green diagonal line
+    startx, starty = startpos
 
-    # Scroll the image across the matrix
-    for n in range(-32, 33):  # Scroll from top-left to bottom-right
-        matrix.Clear()
-        matrix.SetImage(image, n, n)  # Set image with offset
-        time.sleep(0.05)  # Control animation speed
+    # Create an image buffer the size of the desired rectangle
+    image = Image.new("RGB", (xsize, ysize))
+    draw = ImageDraw.Draw(image)
 
-    time.sleep(5)
-    matrix.Clear()
+    # Draw a rectangle across the entire image area
+    draw.rectangle((0, 0, xsize - 1, ysize - 1), fill=(0, 0, 0), outline=(0, 0, 255))
+
+    # Render this image at the specified position on the matrix
+    matrix.SetImage(image, startx, starty)

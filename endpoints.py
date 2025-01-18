@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+import time
 
 # Internal module imports
 import display
@@ -20,5 +21,7 @@ async def drawImage():
     brightness = 20
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
-    display.drawImage(matrix)
+    display.drawImage(matrix,30,30,[2,2])
+    time.sleep(10)
+    matrix.Clear()
     return {"message": "success"}
