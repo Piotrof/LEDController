@@ -24,10 +24,11 @@ async def drawImage():
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
 
+    file_path = "/usr/LEDController/res/tea_sample.jpg"
     print("FASTAPI: Checking file exist ->", os.path.exists(file_path))
     print("FASTAPI: Absolute path ->", os.path.abspath(file_path))
-    
-    image = Image.open("/usr/LEDController/res/tea_sample.jpg")
+
+    image = Image.open(file_path)
     image = image.convert("RGB")
     image = display.scaleImage(image, 28)
     display.drawImage(matrix,image,[2,2])
