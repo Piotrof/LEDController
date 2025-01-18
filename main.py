@@ -19,6 +19,7 @@ options.rows = 32
 options.cols = 64
 options.chain_length = 1
 options.parallel = 1
+options.brightness = 50
 options.hardware_mapping = 'adafruit-hat'  # If you have an Adafruit HAT: 'adafruit-hat'
 
 matrix = RGBMatrix(options = options)
