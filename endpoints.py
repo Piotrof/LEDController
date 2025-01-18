@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 import time
 from PIL import Image
+import os
 
 # Internal module imports
 import display
@@ -22,6 +23,10 @@ async def drawImage():
     brightness = 20
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
+
+    print("FASTAPI: Checking file exist ->", os.path.exists(file_path))
+    print("FASTAPI: Absolute path ->", os.path.abspath(file_path))
+    
     image = Image.open("/usr/LEDController/res/tea_sample.jpg")
     image = image.convert("RGB")
     image = display.scaleImage(image, 28)
