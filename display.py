@@ -120,7 +120,7 @@ def drawImage(matrix, image, startpos):
         for j in range(image.shape[1]):
             matrix.SetPixel(x + j, y + i, int(image[i, j, 0]), int(image[i, j, 1]), int(image[i, j, 2]))
 
-def drawScrollText(matrix: RGBMatrix, text: str, startpos, fontpath: str = "/usr/LEDController/fonts/7x13.bdf"):
+def drawScrollText(matrix: RGBMatrix, text: str, startpos, fontPath: str = "/usr/LEDController/fonts/7x13.bdf"):
     """
     Continuously scrolls 'text' on the given 'matrix' starting at coordinates 'startpos' (x, y).
     This scroll repeats indefinitely until interrupted.
@@ -181,3 +181,70 @@ def drawScrollText(matrix: RGBMatrix, text: str, startpos, fontpath: str = "/usr
 
         time.sleep(0.05)  # Adjust scrolling speed
         offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
+
+def drawTidalOverlay(matrix, text, image, startposText, startposImage, duration, scrollSpeed, fontPath: str = "/usr/LEDController/fonts/7x13.bdf"):
+    """
+    Draws an overlay with a static image and scrolling text on the matrix for a specified duration.
+
+    Args:
+        matrix (RGBMatrix): The RGB matrix on which to draw.
+        text (str): The scrolling text to display.
+        image (numpy.ndarray): The image to display.
+        startpos_text (list[int] or tuple[int, int]): [x, y] coordinates for the text's baseline.
+        startpos_image (list[int] or tuple[int, int]): [x, y] coordinates for the image's top-left corner.
+        duration (float): The time in seconds for which the overlay should be drawn.
+        font_path (str): Path to a BDF font file. Defaults to "/usr/LEDController/fonts/7x13.bdf".
+    """
+    # Prepare double buffer
+    offscreenCanvas = matrix.CreateFrameCanvas()
+
+    # Load font
+    font = graphics.Font()
+    font.LoadFont(fontPath)
+
+    textColor = graphics.Color(255, 255, 255)
+
+    # Unpack coordinates
+    xTextStart, yTextStart = startposText
+    xImgStart, yImgStart = startposImage
+
+    # Start the text off-screen to the right
+    pos = xTextStart + offscreenCanvas.width
+
+    startTime = time.time()
+
+    while True:
+        # Check duration
+        if time.time() - startTime >= duration:
+            break
+
+        offscreenCanvas.Clear()
+
+        # 1) Draw the static image pixel-by-pixel
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                r, g, b = image[i, j]
+                offscreenCanvas.SetPixel(
+                    xImgStart + j,
+                    yImgStart + i,
+                    int(r), int(g), int(b)
+                )
+
+        # 2) Draw the scrolling text
+        textLen = graphics.DrawText(
+            offscreenCanvas,
+            font,
+            pos,
+            yTextStart,
+            textColor,
+            text
+        )
+
+        # Move text left
+        pos -= 1
+        if (pos + textLen < xTextStart):
+            pos = xTextStart + offscreenCanvas.width
+
+        # 3) Swap buffers to update display
+        time.sleep(scrollSpeed)  # Adjust scrolling speed
+        offscreenCanvas = matrix.SwapOnVSync(offscreenCanvas)

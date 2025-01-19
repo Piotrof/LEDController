@@ -19,7 +19,7 @@ async def sayHello():
 @router.post("/draw")
 async def drawImage():
     """
-    Test endpoint to draw an image to the matrix
+    Test endpoint to draw the Tidal overlay
     """
     brightness = 40
     options = display.setMatrixOptions(brightness)
@@ -28,9 +28,7 @@ async def drawImage():
     imagePath = "/usr/LEDController/res/test.png"
     image = display.openImage(imagePath)
     image = display.scaleImage(image, 28)
-    display.drawImage(matrix, image, [2,2])
     text = "Test string to scroll through"
-    display.drawScrollText(matrix, text, [34,2])
-    time.sleep(10)
+    display.drawTidalOverlay(matrix, image,[32,16],[2,2],20,0.1)
     matrix.Clear()
     return {"message": "success"}
