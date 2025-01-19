@@ -52,6 +52,26 @@ def initializeMatrix(options: RGBMatrixOptions) -> RGBMatrix:
     matrix = RGBMatrix(options=options)
     return matrix
 
+def openImage(image_path: str) -> Image.Image:
+    """
+    Opens and returns a PIL Image object from the specified file path.
+
+    Args:
+        image_path (str): The path to the image file.
+
+    Returns:
+        PIL.Image.Image: The opened image.
+
+    Raises:
+        ValueError: If the provided image_path is not a valid file path.
+    """
+    if not os.path.isfile(image_path):
+        raise ValueError("Invalid image file path provided.")
+    
+    image = Image.open(image_path)
+    image = image.convert("RGB")
+    return image
+
 def drawImage(matrix: RGBMatrix, image: Image.Image, startpos: list[int]):
     """
     Draws the provided PIL Image pixel-by-pixel on the given RGB matrix at the

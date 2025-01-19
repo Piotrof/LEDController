@@ -23,10 +23,7 @@ async def drawImage():
     brightness = 20
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
-    time.sleep(1)
-    ImageFile.LOAD_TRUNCATED_IMAGES=True
-    image = Image.open("/usr/LEDController/res/test.png")
-    image = image.convert("RGB")
+    image = display.openImage("/usr/LEDController/res/test.jpg")
     image = display.scaleImage(image, 28)
     display.drawImage(matrix,image,[2,2])
     time.sleep(10)
