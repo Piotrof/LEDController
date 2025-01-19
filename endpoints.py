@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 import os
-from PIL import Image
+from PIL import Image, ImageFile
 import time
 
 # Internal module imports
@@ -24,6 +24,7 @@ async def drawImage():
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
     time.sleep(1)
+    ImageFile.LOAD_TRUNCATED_IMAGES=True
     image = Image.open("/usr/LEDController/res/test.png")
     image = image.convert("RGB")
     image = display.scaleImage(image, 28)
