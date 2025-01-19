@@ -1,6 +1,4 @@
 from fastapi import APIRouter
-import time
-from PIL import Image
 import os
 
 # Internal module imports
