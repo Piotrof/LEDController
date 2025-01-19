@@ -182,7 +182,7 @@ def drawScrollText(matrix: RGBMatrix, text: str, startpos, fontPath: str = "/usr
         time.sleep(0.05)  # Adjust scrolling speed
         offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
 
-def drawTidalOverlay(matrix, text, image, startposText, startposImage, duration, scrollSpeed, fontPath: str = "/usr/LEDController/fonts/7x13.bdf"):
+def drawMusicOverlay(matrix, text, image, startposText, startposImage, duration, scrollSpeed, fontPath: str = "/usr/LEDController/fonts/7x13.bdf"):
     """
     Draws an overlay with a static image and scrolling text on the matrix for a specified duration.
 
