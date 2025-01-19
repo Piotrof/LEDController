@@ -1,7 +1,8 @@
 import time
 import cv2
 import numpy as np
-from rgbmatrix import RGBMatrix, RGBMatrixOptions
+from rgbmatrix import RGBMatrix, RGBMatrixOptions, graphics
+from samplebase import SampleBase
 import os
 
 """
