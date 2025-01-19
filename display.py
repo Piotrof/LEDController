@@ -220,17 +220,7 @@ def drawTidalOverlay(matrix, text, image, startposText, startposImage, duration,
 
         offscreenCanvas.Clear()
 
-        # 1) Draw the static image pixel-by-pixel
-        for i in range(image.shape[0]):
-            for j in range(image.shape[1]):
-                r, g, b = image[i, j]
-                offscreenCanvas.SetPixel(
-                    xImgStart + j,
-                    yImgStart + i,
-                    int(r), int(g), int(b)
-                )
-
-        # 2) Draw the scrolling text
+        # 1) Draw the scrolling text
         textLen = graphics.DrawText(
             offscreenCanvas,
             font,
@@ -239,6 +229,27 @@ def drawTidalOverlay(matrix, text, image, startposText, startposImage, duration,
             textColor,
             text
         )
+
+        # 2) Draw a 2-pixel-wide black border around where the image will be drawn
+        for i in range(-2, image.shape[0] + 2):
+            for j in range(-2, image.shape[1] + 2):
+                # Check if the current (i, j) position is outside the actual image boundaries
+                if i < 0 or i >= image.shape[0] or j < 0 or j >= image.shape[1]:
+                    offscreenCanvas.SetPixel(
+                        xImgStart + j,
+                        yImgStart + i,
+                        0, 0, 0  # RGB black
+                    )
+
+        # 3) Draw the image
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                r, g, b = image[i, j]
+                offscreenCanvas.SetPixel(
+                    xImgStart + j,
+                    yImgStart + i,
+                    int(r), int(g), int(b)
+                )
 
         # Move text left
         pos -= 1
