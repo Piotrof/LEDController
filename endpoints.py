@@ -29,6 +29,6 @@ async def drawImage():
     image = display.openImage(imagePath)
     image = display.scaleImage(image, 28)
     text = "Test string to scroll through"
-    display.drawTidalOverlay(matrix,text,image,[32,16],[2,2],20,0.1)
+    display.drawTidalOverlay(matrix,text,image,[32,20],[2,2],20,0.2)
     matrix.Clear()
     return {"message": "success"}

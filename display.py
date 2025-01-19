@@ -242,7 +242,7 @@ def drawTidalOverlay(matrix, text, image, startposText, startposImage, duration,
 
         # Move text left
         pos -= 1
-        if (pos + textLen < xTextStart):
+        if (pos + textLen) <= 32:
             pos = xTextStart + offscreenCanvas.width
 
         # 3) Swap buffers to update display
