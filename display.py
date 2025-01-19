@@ -85,7 +85,6 @@ def drawImage(matrix: RGBMatrix, image: Image.Image, startpos: list[int]):
     width, height = image.size
 
     # Draw each pixel to the matrix
-    # (Assuming the image is in "RGB" mode; if it's RGBA, handle the alpha channel as needed)
     for y in range(height):
         for x in range(width):
             r, g, b = image.getpixel((x, y))
