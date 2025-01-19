@@ -1,6 +1,6 @@
 import time
-from PIL import Image
-from PIL import ImageDraw
+import cv2
+import numpy as np
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 import os
 
@@ -53,75 +53,47 @@ def initializeMatrix(options: RGBMatrixOptions) -> RGBMatrix:
     matrix = RGBMatrix(options=options)
     return matrix
 
-def openImage(image_path: str) -> Image.Image:
+def scaleImage(image, size):
     """
-    Opens and returns a PIL Image object from the specified file path.
-
-    Args:
-        image_path (str): The path to the image file.
-
-    Returns:
-        PIL.Image.Image: The opened image.
-
-    Raises:
-        ValueError: If the provided image_path is not a valid file path.
-    """
-    if not os.path.isfile(image_path):
-        raise ValueError("Invalid image file path provided.")
+    Scales the image to the specified size.
     
-    image = Image.open(image_path)
-    image = image.convert("RGB")
-    return image
-
-def drawImage(matrix: RGBMatrix, image: Image.Image, startpos: list[int]):
+    Args:
+        image (numpy.ndarray): The image to be scaled.
+        size (int): The size to scale the image to.
+    
+    Returns:
+        numpy.ndarray: The scaled image.
     """
-    Draws the provided PIL Image pixel-by-pixel on the given RGB matrix at the
-    specified top-left coordinates.
+    return cv2.resize(image, (size, size))
+
+def drawImage(matrix, image, startpos):
+    """
+    Draws the image on the matrix at the specified top-left coordinates.
 
     Args:
         matrix (RGBMatrix): The RGB matrix on which to draw.
-        image (PIL.Image.Image): The PIL Image to be drawn.
+        image (numpy.ndarray): The image to be drawn.
         startpos (list[int] or tuple[int, int]): [x, y] coordinates of the image's
             top-left corner on the matrix.
 
     Raises:
         ValueError: If the provided matrix is not an instance of RGBMatrix, if 'image'
-            is not a PIL Image, or if 'startpos' is not a 2-element list/tuple.
+            is not a numpy ndarray, or if 'startpos' is not a 2-element list/tuple.
     """
     # Validate matrix
     if not isinstance(matrix, RGBMatrix):
         raise ValueError("Provided matrix must be an instance of RGBMatrix.")
 
     # Validate image
-    if not isinstance(image, Image.Image):
-        raise ValueError("Provided image must be a PIL Image object.")
+    if not isinstance(image, np.ndarray):
+        raise ValueError("Provided image must be a numpy ndarray.")
 
     # Validate startpos
     if not isinstance(startpos, (list, tuple)) or len(startpos) != 2:
-        raise ValueError("startpos must be a list or tuple of two integers, e.g., [x, y].")
+        raise ValueError("startpos must be a list or tuple of length 2.")
 
-    startx, starty = startpos
-
-    # Get image dimensions
-    width, height = image.size
-
-    # Draw each pixel to the matrix
-    for y in range(height):
-        for x in range(width):
-            r, g, b = image.getpixel((x, y))
-            matrix.SetPixel(startx + x, starty + y, r, g, b)
-
-def scaleImage(image: Image.Image, new_size: int) -> Image.Image:
-    """
-    Scales the given PIL Image to new_size x new_size pixels and returns the resized image.
-    
-    Args:
-        image (PIL.Image.Image): The input image to scale.
-        new_size (int): The width and height (in pixels) to which the image should be scaled.
-    
-    Returns:
-        PIL.Image.Image: A new Image object resized to new_size x new_size pixels.
-    """
-    # Use a high-quality resampling filter such as LANCZOS
-    resized_image = image.resize((new_size, new_size), resample=Image.Resampling.LANCZOS)
-    return resized_image
+    # Draw the image on the matrix
+    x, y = startpos
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            matrix.SetPixel(x + j, y + i, int(image[i, j, 0]), int(image[i, j, 1]), int(image[i, j, 2]))
