@@ -2,9 +2,10 @@ import time
 from PIL import Image
 from PIL import ImageDraw
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
+import os
 
 """
-This file contains all functions necessary to controll the LED display
+This file contains all functions necessary to controll the LED display and display ellements.
 """
 
 def setMatrixOptions(brightness: int):
