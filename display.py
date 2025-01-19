@@ -53,6 +53,28 @@ def initializeMatrix(options: RGBMatrixOptions) -> RGBMatrix:
     matrix = RGBMatrix(options=options)
     return matrix
 
+def openImage(image_path: str):
+    """
+    Opens an image from the given path using OpenCV, converts it to RGB,
+    and returns the resulting image array.
+
+    Args:
+        image_path (str): Path to the image file.
+
+    Returns:
+        numpy.ndarray: The image array in RGB format.
+
+    Raises:
+        ValueError: If the image cannot be opened.
+    """
+    image = cv2.imread(image_path)
+    if image is None:
+        raise ValueError(f"Cannot identify or open image file: {image_path}")
+
+    # Convert the BGR image (default from OpenCV) to RGB
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    return image_rgb
+
 def scaleImage(image, size):
     """
     Scales the image to the specified size.
@@ -97,3 +119,65 @@ def drawImage(matrix, image, startpos):
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
             matrix.SetPixel(x + j, y + i, int(image[i, j, 0]), int(image[i, j, 1]), int(image[i, j, 2]))
+
+def drawScrollText(matrix: RGBMatrix, text: str, startpos, fontpath: str = "../fonts/LEDBOARD-8pt.bdf"):
+    """
+    Continuously scrolls 'text' on the given 'matrix' starting at coordinates 'startpos' (x, y).
+    This scroll repeats indefinitely until interrupted.
+
+    Args:
+        matrix (RGBMatrix): The RGB matrix on which to draw.
+        text (str): The text to be displayed.
+        startpos (list[int] or tuple[int, int]): [x, y] coordinates for the text's baseline
+            on the matrix. (y is the vertical baseline for the font).
+        font_path (str, optional): Path to a BDF font file. Defaults to a 7x13 BDF.
+
+    Raises:
+        ValueError: If matrix is not an instance of RGBMatrix or startpos is invalid.
+    """
+    if not isinstance(matrix, RGBMatrix):
+        raise ValueError("Provided matrix must be an instance of RGBMatrix.")
+
+    if not isinstance(startpos, (list, tuple)) or len(startpos) != 2:
+        raise ValueError("startpos must be a list or tuple of length 2.")
+
+    offscreen_canvas = matrix.CreateFrameCanvas()
+
+    # Load font
+    font = graphics.Font()
+    font.LoadFont(fontpath)
+
+    # Choose a text color (yellow here, can customize)
+    text_color = graphics.Color(255, 255, 255)
+
+    # Decompose startpos
+    x_start, y_start = startpos
+
+    # 'pos' is the current x-coordinate from which text is drawn.
+    # Start it from the x_start offset plus the canvas width so it
+    # scrolls in from the right side.
+    pos = x_start + offscreen_canvas.width
+
+    while True:
+        offscreen_canvas.Clear()
+
+        # DrawText returns the width of the drawn text in pixels
+        text_length = graphics.DrawText(
+            offscreen_canvas,
+            font,
+            pos,
+            y_start,  # baseline for the font
+            text_color,
+            text
+        )
+
+        pos -= 1  # Move text left by 1 pixel each frame
+
+        # Once the entire text has scrolled past the left boundary
+        # (x_start + text_length < x_start), reset pos.
+        # This means the text fully exits the screen, then we reset.
+        if (pos + text_length < x_start):
+            pos = x_start + offscreen_canvas.width
+
+        time.sleep(0.05)  # Adjust scrolling speed
+        offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)

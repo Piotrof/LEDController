@@ -25,13 +25,12 @@ async def drawImage():
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
     time.sleep(1)
-    image_path = "/usr/LEDController/res/tea_sample.png"
-    image = cv2.imread(image_path)
-    if image is None:
-        raise ValueError(f"Cannot identify image file {image_path}")
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    imagePath = "/usr/LEDController/res/test.png"
+    image = display.openImage(imagePath)
     image = display.scaleImage(image, 28)
-    display.drawImage(matrix, image, [2, 2])
+    display.drawImage(matrix, image, [2,2])
+    text = "Test string to scroll through"
+    display.drawScrollText(matrix, text, [34,2])
     time.sleep(10)
     matrix.Clear()
     return {"message": "success"}
