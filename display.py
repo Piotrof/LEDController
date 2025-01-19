@@ -209,7 +209,7 @@ def drawTidalOverlay(matrix, text, image, startposText, startposImage, duration,
     xImgStart, yImgStart = startposImage
 
     # Start the text off-screen to the right
-    pos = xTextStart + offscreenCanvas.width
+    pos = xTextStart + offscreenCanvas.width/2
 
     startTime = time.time()
 
