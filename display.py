@@ -120,7 +120,7 @@ def drawImage(matrix, image, startpos):
         for j in range(image.shape[1]):
             matrix.SetPixel(x + j, y + i, int(image[i, j, 0]), int(image[i, j, 1]), int(image[i, j, 2]))
 
-def drawScrollText(matrix: RGBMatrix, text: str, startpos, fontpath: str = "../fonts/LEDBOARD-8pt.bdf"):
+def drawScrollText(matrix: RGBMatrix, text: str, startpos, fontpath: str = "/usr/LEDController/fonts/7x13.bdf"):
     """
     Continuously scrolls 'text' on the given 'matrix' starting at coordinates 'startpos' (x, y).
     This scroll repeats indefinitely until interrupted.
