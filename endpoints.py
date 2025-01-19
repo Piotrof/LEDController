@@ -21,11 +21,11 @@ async def drawImage():
     """
     Test endpoint to draw an image to the matrix
     """
-    brightness = 20
+    brightness = 40
     options = display.setMatrixOptions(brightness)
     matrix = display.initializeMatrix(options)
     time.sleep(1)
-    image_path = "/usr/LEDController/res/test.png"
+    image_path = "/usr/LEDController/res/tea_sample.png"
     image = cv2.imread(image_path)
     if image is None:
         raise ValueError(f"Cannot identify image file {image_path}")
