@@ -1,34 +1,77 @@
-from fastapi import APIRouter
-import os
+"""
+API endpoints for the LED Controller service.
+"""
+import logging
 import time
-import cv2
-import numpy as np
+from pathlib import Path
+
+from fastapi import APIRouter, HTTPException
 
 # Internal module imports
 import display
+from config import config
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
+
 @router.get("/hello")
-async def sayHello():
+async def say_hello() -> dict:
     """
-    This endpoint will return user info (IP, API key, currently used TIDAL login info etc.)
+    Health check endpoint that returns a simple greeting.
+    
+    Returns:
+        A dictionary with a greeting message.
     """
+    logger.info("Health check endpoint accessed")
     return {"message": "Hello from your async endpoint!"}
 
+
 @router.post("/draw")
-async def drawImage():
+async def draw_image() -> dict:
     """
-    Test endpoint to draw the Tidal overlay
+    Test endpoint to draw the Tidal overlay.
+    
+    Returns:
+        A dictionary indicating success or failure.
+        
+    Raises:
+        HTTPException: If there's an error during image processing or display.
     """
-    brightness = 40
-    options = display.setMatrixOptions(brightness)
-    matrix = display.initializeMatrix(options)
-    time.sleep(1)
-    imagePath = "/usr/LEDController/res/test.png"
-    image = display.openImage(imagePath)
-    image = display.scaleImage(image, 28)
-    text = "Test string to scroll through"
-    display.drawMusicOverlay(matrix,text,image,[2,20],[2,2],20,0.2)
-    matrix.Clear()
-    return {"message": "success"}
+    try:
+        logger.info("Draw endpoint accessed")
+        
+        brightness = config.DEFAULT_BRIGHTNESS
+        options = display.set_matrix_options(brightness)
+        matrix = display.initialize_matrix(options)
+        
+        # Brief pause to ensure matrix is ready
+        time.sleep(1)
+        
+        image_path = config.RESOURCES_DIR / "test.png"
+        
+        if not image_path.exists():
+            logger.error(f"Test image not found at {image_path}")
+            raise HTTPException(status_code=404, detail=f"Test image not found at {image_path}")
+        
+        image = display.open_image(str(image_path))
+        image = display.scale_image(image, 28)
+        text = "Test string to scroll through"
+        
+        display.draw_music_overlay(
+            matrix, 
+            text, 
+            image, 
+            (2, 20),  # start_pos_text
+            (2, 2),   # start_pos_image
+            20,       # duration
+            0.2       # scroll_speed
+        )
+        
+        matrix.Clear()
+        logger.info("Draw operation completed successfully")
+        return {"message": "success"}
+        
+    except Exception as e:
+        logger.error(f"Error in draw endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
